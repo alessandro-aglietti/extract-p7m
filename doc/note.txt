@@ -1,0 +1,63 @@
+https://applicazioni.cnipa.gov.it/TSL/IT_TSL_signed.xml
+
+openssl.exe smime -decrypt -verify -inform DER -in "pippo.tif.p7m" -noverify -out "pippo.tif"
+
+openssl smime -decrypt -verify -inform DER -in IAVCTD4_RilievoEssenze.dxf.p7m -noverify -out IAVCTD4_RilievoEssenze.dxf
+[le virgolette se ci sono spazi (metterle sempre)]
+
+1) Estraggo il certificato e lo scrivo sul file pippo.cert
+
+    openssl.exe pkcs7 -inform DER -print_certs -text -in "pippo.tif.p7m" -out "pippo.cert"
+
+e successivamente, avendo ottenuto il file "pippo.cert" dovremmo dare il comando:
+
+    openssl.exe x509 -in "pippo.cert" -subject -startdate -enddate -checkend 10 -noout
+
+ Con questo comando otterremo le informazioni sul nome del firmatario, 
+le due date di inizio e fine validità per le quali dovemmo verificare che
+ l'attuale data sia compresa. Il -checkend 10 chiede ad openssl di verificare
+ che nei prossimi 10 secondi il certificato scada.
+
+Mancherebbe il controllo presso la CA (Certification Authoritiy) della CRL 
+(Certification Revocation List) ove le CA sono obbligate ad inserire il
+ certificato divenuto inattendibile per denuncia di furto/smarrimento del
+ dispositivo di firma (token o smartcard), scadenza naturale o altri eventi accidentali.
+
+EXIT CODES (SMIME)
+------------------
+0: the operation was completely successfully.
+1: an error occurred parsing the command options.
+2: one of the input files could not be read.
+3: an error occurred creating the PKCS#7 file or when reading the MIME message.
+4: an error occurred decrypting or verifying the message.
+5: the message was verified correctly but an error occurred writing out the signers certificates.
+in pratica:
+0: OK
+4: errore nella verifica
+altri: errore generico
+
+ESEMPI EXIT CODES
+-----------------
+
+==================ERROR
+nicola@badgpo099:~/_LI_$ openssl smime -decrypt -noverify -inform DER -in a.pdf.p7m -noverify -out a.pdf
+No recipient certificate or key specified
+Usage smime [options] cert.pem ...
+..........
+.......... (help)
+nicola@badgpo099:~/_LI_$ echo $?
+1
+
+===================VERIFICATION FAILED
+nicola@badgpo099:~/_LI_$ openssl smime -decrypt -verify -inform DER -in a.pdf.p7m -noverify -out a.pdf
+Verification failure
+3826:error:21071065:PKCS7 routines:PKCS7_signatureVerify:digest failure:pk7_doit.c:948:
+3826:error:21075069:PKCS7 routines:PKCS7_verify:signature failure:pk7_smime.c:312:
+nicola@badgpo099:~/_LI_$ echo $?
+4
+
+=========================OK
+nicola@badgpo099:~/_LI_$ openssl smime -decrypt -verify -inform DER -in IAVCTD4_RilievoEssenze.dxf.p7m -noverify -out IAVCTD4_RilievoEssenze.dxf
+Verification successful
+nicola@badgpo099:~/_LI_$ echo $?
+0
