@@ -26,7 +26,7 @@ my $current_dir;
 opendir ($current_dir, ".") or die $!;
 while (my $file = readdir($current_dir)) {
 
-    if ($file =~ /(.*\.pdf)(\.p7m)*/) {    
+    if ($file =~ /^(.*\.pdf)(\.p7m)+$/) {    
         my $nomefile_pdf = $1;
         my $nomefile_p7m = $file;
         extractPdfFile($nomefile_p7m, $nomefile_pdf);
