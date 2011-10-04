@@ -25,7 +25,7 @@ INSTALLAZIONE PREREQUISITI LINUX
 --------------------------------
 Perl e openssl dovrebbero essere gia' installati. Se non fosse cosi'
 installare i pacchetti della propria distribuzione, per esempio su
-xubuntu-11.04 eseguire il comando:
+ubuntu eseguire il comando:
 
 sudo apt-get install perl openssl
 
