@@ -30,7 +30,7 @@ foreach (1..5) {
 
     while (my $file = readdir($current_dir)) {
         my $estensione = substr ($file,-4,4);
-        if ($estensione eq '.p7m') {
+        if ((lc($estensione)) eq '.p7m') {
             openssl_decrypt_file($file);
         }
     }
